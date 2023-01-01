@@ -1,0 +1,83 @@
+Note: Instead of creating table with name order I've named it orders
+
+1.
+CREATE TABLE IF NOT EXISTS supplier(
+SUPP_ID int primary key,
+SUPP_NAME varchar(50) NOT NULL,
+SUPP_CITY varchar(50),
+SUPP_PHONE varchar(10) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS customer(
+CUS_ID INT NOT NULL,
+CUS_NAME VARCHAR(20) NOT NULL,
+CUS_PHONE VARCHAR(10) NOT NULL,
+CUS_CITY varchar(30) NOT NULL,
+CUS_GENDER CHAR,
+PRIMARY KEY (CUS_ID));
+CREATE TABLE IF NOT EXISTS category (
+CAT_ID INT NOT NULL,
+CAT_NAME VARCHAR(20) NOT NULL,
+PRIMARY KEY (CAT_ID)
+);
+
+CREATE TABLE IF NOT EXISTS product (
+PRO_ID INT NOT NULL,
+PRO_NAME VARCHAR(20) NOT NULL DEFAULT "Dummy",
+PRO_DESC VARCHAR(60),
+CAT_ID INT NOT NULL,
+PRIMARY KEY (PRO_ID),
+FOREIGN KEY (CAT_ID) REFERENCES CATEGORY (CAT_ID)
+);
+
+CREATE TABLE IF NOT EXISTS supplier_pricing (
+PRICING_ID INT NOT NULL,
+PRO_ID INT NOT NULL,
+SUPP_ID INT NOT NULL,
+SUPP_PRICE INT DEFAULT 0,
+PRIMARY KEY (PRICING_ID),
+FOREIGN KEY (PRO_ID) REFERENCES PRODUCT (PRO_ID),
+FOREIGN KEY (SUPP_ID) REFERENCES SUPPLIER(SUPP_ID)
+);
+
+CREATE TABLE IF NOT EXISTS `order` (
+ORD_ID INT NOT NULL,
+ORD_AMOUNT INT NOT NULL,
+ORD_DATE DATE,
+CUS_ID INT NOT NULL,
+PRICING_ID INT NOT NULL,
+PRIMARY KEY (ORD_ID),
+FOREIGN KEY (CUS_ID) REFERENCES CUSTOMER(CUS_ID),
+FOREIGN KEY (PRICING_ID) REFERENCES SUPPLIER_PRICING(PRICING_ID)
+);
+
+CREATE TABLE IF NOT EXISTS rating (
+RAT_ID INT NOT NULL,
+ORD_ID INT NOT NULL,
+RAT_RATSTARS INT NOT NULL,
+PRIMARY KEY (RAT_ID),
+FOREIGN KEY (ORD_ID) REFERENCES `order`(ORD_ID)
+);
+
+2.
+INSERT INTO SUPPLIER VALUES(1,"Rajesh Retails","Delhi",'1234567890')
+INSERT INTO CUSTOMER VALUES(1,"AAKASH",'9999999999',"DELHI",'M');
+INSERT INTO CATEGORY VALUES( 1,"BOOKS")
+INSERT INTO PRODUCT VALUES(1,"GTA V","Windows 7 and above with i5 processor and 8GB RAM",2);
+INSERT INTO SUPPLIER_PRICING VALUES(1,1,2,1500);
+INSERT INTO ORDERS VALUES (101,1500,"2021-10-06",2,1);
+INSERT INTO RATING VALUES(1,101,4);
+
+3.
+select cus_gender,count(cus_gender) from customer,orders 
+where  customer.cus_id=orders.cus_id and orders.ord_amount>=3000 group by cus_gender;
+
+
+7.
+
+select product.pro_id,product.pro_name from orders 
+inner join supplier_pricing on supplier_pricing.pricing_id=orders.pricing_id 
+inner join product on product.pro_id=supplier_pricing.pro_id where orders.ord_date>"2021-10-05";
+
+8.
+select customer.cus_name,customer.cus_gender from customer where customer.cus_name like 'A%' or customer.cus_name like '%A';
